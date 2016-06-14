@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>扫雷</title>
+</head>
+<style>
+	body{
+		background:url(benjing.png)no-repeat;
+		overflow-x:hidden;
+	}
+	.box{
+		width:600px;
+		height:600px;
+		position:absolute;
+		margin:auto;
+		left:0;
+		right:0;
+		top:0;
+		bottom:0;
+		background:#157508;
+		display:none;
+/*		box-shadow: 3px 3px 6px 6px #AC903C,-3px -3px 6px 6px #AC903C;*/
+	}
+	.block{
+		text-align: center;
+		line-height: 59px;
+		width:59px;
+		height:59px;
+		margin-top:1px;
+		margin-right: 1px;
+		background:url(lvdi.png)no-repeat;
+		float:left;
+	}
+	.red{
+		background:url(di.png)no-repeat;
+	}
+	.biaoji{
+		background:url(1.jpg)no-repeat;
+	}
+	.green{
+		background:url(tudi.png)no-repeat;
+		font-weight: bold;
+		font-size: 30px;
+	}
+	.ka{
+		width:600px;
+		height:600px;
+		position:absolute;
+		left:0;
+		right:0;
+		top:0;
+		bottom:0;
+		margin:auto;
+		background:rgba(0,0,0,0.3);
+		display:none;
+		text-align: center;
+		line-height: 600px;
+		font-size: 60px;
+		font-weight: bold;
+		color:red;
+	}
+	.read{
+		position:absolute;
+		margin:auto;
+		left:0;
+		right:0;
+		top:-900px;
+		bottom:0;
+		width:300px;
+		height:150px;
+		text-align: center;
+		line-height: 100px
+	}
+	.sjian{
+		position:absolute;
+		margin:auto;
+		right:-200px;
+		top:100px;
+		width:150px;
+		height:50px;
+		border:1px solid red;
+		background: #157B08;
+		font-weight:bold;
+		font-size: 20px;
+		color:#fff;
+		text-align: center;
+		line-height: 50px
+	}
+	.fanhui{
+		position:absolute;
+		margin:auto;
+		right:-200px;
+		top:180px;
+		width:150px;
+		height:50px;
+		border:1px solid red;
+		background: #157B08;
+		font-weight:bold;
+		font-size: 20px;
+		color:#fff;
+		text-align: center;
+		line-height: 50px
+	}
+</style>
+<body>
+	<div class="read">
+		<img src="kaishi.png" alt="">
+	</div>
+	<div class="box"></div>
+	<div class="ka"></div>
+	<div class="sjian"> 
+	时间：<span id="time"></span>秒 
+	</div>
+	<div class="fanhui"> 
+	<span>返回</span>
+	</div>
+	<script src = "js/jquery-1.12.0.js"></script>
+	<script>
+	$(function(){
+		var hang=10;
+		$('.read').animate({top:'+=900'},1000)
+		$('.read').on('click',function(){
+			$('.read').slideUp(500)
+			buju();
+			$('.box')
+			.fadeIn(2000)
+			.queue(timer)
+			.dequeue()
+			$('.sjian').animate({right:200},1000);
+			$('.fanhui').animate({right:200},1000);
+		})
+		$('.ka').on('click',function(){
+			$('.ka').slideUp(600);
+			buju();
+			timer();
+		})
+		$('.fanhui').on('click',function(){
+			$('.box')
+			.fadeOut(1000)
+			.delay(300)
+			.queue(stop)
+			.dequeue()
+			$('.read').slideDown(2000)
+			$('.sjian').animate({right:-200},1000);
+			$('.fanhui').animate({right:-200},1000);
+			$('.ka').css('display','none')
+		})
+
+
+		$(".box").on('contextmenu',false)
+		var xy2id =function(x,y){return x+'-'+y};
+		var jishuan = function(x,y){
+			var num = 0;
+			if($('#'+xy2id(x,y-1)).is('.lei')){num++}
+			if($('#'+xy2id(x,y+1)).is('.lei')){num++}
+			if($('#'+xy2id(x-1,y)).is('.lei')){num++}
+			if($('#'+xy2id(x+1,y)).is('.lei')){num++}
+			if($('#'+xy2id(x-1,y-1)).is('.lei')){num++}
+			if($('#'+xy2id(x-1,y+1)).is('.lei')){num++}
+			if($('#'+xy2id(x+1,y+1)).is('.lei')){num++}
+			if($('#'+xy2id(x+1,y-1)).is('.lei')){num++}
+				return num;
+		}
+		var zuo = function(e){
+			if($(this).is('.biaoji')){
+				return
+			}
+		    if(e.data.lei){
+		    	$(this).addClass('red')
+		    	$('.lei').addClass('red')
+				$('.ka').css('display','block').text('你输啦!')
+				$('.block').off('mousedown')
+				stop();
+			}else{
+				if(jishuan(e.data.x,e.data.y)===1){
+					$(this).addClass('green').css('color','blue')
+				}
+				if(jishuan(e.data.x,e.data.y)===2){
+					$(this).addClass('green').css('color','green')
+				}
+				if(jishuan(e.data.x,e.data.y)===3){
+					$(this).addClass('green').css('color','red')
+				}
+				if(jishuan(e.data.x,e.data.y)===4){
+					$(this).addClass('green').css('color','pink')
+				}
+				if(jishuan(e.data.x,e.data.y)===5){
+					$(this).addClass('green').css('color','yellow')
+				}
+				$(this).addClass('green').text(jishuan(e.data.x,e.data.y))
+				}	
+		}
+		var you = function(e){	
+			if($(this).is('.green')||$(this).is('.red')){
+				return
+			}
+			$(this).toggleClass('biaoji')
+			if($('.biaoji').length === $('.lei').length){
+				if($('.biaoji.lei').length === $('.biaoji').length){
+					$('.ka').css('display','block').text('你赢啦!')	
+					$('.block').off('mousedown')	
+				
+				}
+			}				
+		}
+		var clickHandler = function(e){
+			if( e.which === 1 ){
+				// zuo.call(this,e) 有兼容性
+				$.proxy(zuo,this)(e)
+			}else if( e.which === 3 ){
+				$.proxy(you,this)(e)
+			}
+		}
+		//地雷
+		function buju(){
+			var wh = Math.floor(600/hang);
+			var box = $('.box').height(wh*hang).width(wh*hang);
+			box.empty();
+			for (var i = 0; i <hang; i++) {
+				for (var j = 0 ; j < hang; j++) {
+					var islei = Math.random()>0.8;
+					$('<div>')
+					.addClass(function(){
+						return 'block '+ (islei?'lei':'')
+					})
+					.width(wh-1)
+					.height(wh-1)
+					.attr('id',i+'-'+j)
+					.on('mousedown',{x:i,y:j,lei:islei},clickHandler)
+					.appendTo(box)
+				}
+			}
+		}
+		buju();
+		//记时间
+		var	t;
+		function timer(){ 
+			var i = 0;
+			 t = setInterval(add,1000)
+			function add(){
+				i+=1;
+				$('#time').text(i); 
+			}
+		}
+		function stop(){
+			clearInterval(t);
+		}	
+		
+	})
+	
+	</script>
+</body>
+</html>
